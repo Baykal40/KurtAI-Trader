@@ -18,3 +18,14 @@ def rsi(close, period=14):
     rs = avg_gain / avg_loss
 
     return 100 - (100 / (1 + rs))
+def macd(close):
+
+    ema12 = close.ewm(span=12, adjust=False).mean()
+
+    ema26 = close.ewm(span=26, adjust=False).mean()
+
+    macd_line = ema12 - ema26
+
+    signal_line = macd_line.ewm(span=9, adjust=False).mean()
+
+    return macd_line, signal_line
