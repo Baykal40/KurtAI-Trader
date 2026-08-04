@@ -1,19 +1,62 @@
-import pandas as pd
+from analyzer import analyze
+from paper_wallet import PaperWallet
+from scanner import get_usdt_coins
 
-from candle_service import get_candles
-from indicators import ema, rsi, macd, atr
+import time
 
-closes = get_candles("BTCUSDT")
+wallet = PaperWallet()
 
-close = pd.Series(closes)
+coins = get_usdt_coins(100)
 
-ema20 = ema(close, 20)
-rsi14 = rsi(close)
-macd_line, signal_line = macd(close)
-atr14 = atr(close)
-print("Son Fiyat :", close.iloc[-1])
-print("EMA20     :", round(ema20.iloc[-1], 2))
-print("RSI14     :", round(rsi14.iloc[-1], 2))
-print("MACD    :", round(macd_line.iloc[-1], 2))
-print("Signal  :", round(signal_line.iloc[-1], 2))
-print("ATR14    :", round(atr14.iloc[-1], 2))
+start = time.time()
+
+results = []
+
+for coin in coins:
+
+    result = analyze(coin["symbol"])
+
+    results.append(result)
+
+results.sort(
+    key=lambda x: x["score"],
+    reverse=True
+)
+
+print()
+print("=" * 50)
+print(f"{'Coin':12} {'Score':>6} {'Karar':>12}")
+print("=" * 50)
+
+for coin in results[:10]:
+
+    print(
+        f"{coin['symbol']:12}"
+        f"{coin['score']:>8}"
+        f"{coin['trade']:>12}"
+    )
+
+best_coin = results[0]
+
+if best_coin["trade"] == "🟢 AL":
+
+    wallet.buy(
+        best_coin["symbol"],
+        100
+    )
+
+for coin in results:
+
+    if (
+        coin["trade"] == "🔴 BEKLE"
+        and wallet.has_position(coin["symbol"])
+    ):
+
+        wallet.sell(coin["symbol"])
+
+end = time.time()
+
+print()
+print("Analiz Süresi:", round(end - start, 2), "saniye")
+
+wallet.show()
