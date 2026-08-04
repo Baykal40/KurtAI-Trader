@@ -29,3 +29,8 @@ def macd(close):
     signal_line = macd_line.ewm(span=9, adjust=False).mean()
 
     return macd_line, signal_line
+def atr(close, period=14):
+
+    tr = close.diff().abs()
+
+    return tr.rolling(period).mean()
