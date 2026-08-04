@@ -36,23 +36,11 @@ for coin in results[:10]:
         f"{coin['trade']:>12}"
     )
 
-best_coin = results[0]
-
-if best_coin["trade"] == "🟢 AL":
-
-    wallet.buy(
-        best_coin["symbol"],
-        100
-    )
-
 for coin in results:
 
-    if (
-        coin["trade"] == "🔴 BEKLE"
-        and wallet.has_position(coin["symbol"])
-    ):
+    if coin["trade"] == "🟢 AL":
 
-        wallet.sell(coin["symbol"])
+        wallet.buy(coin["symbol"])
 
 end = time.time()
 
