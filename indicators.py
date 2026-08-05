@@ -48,3 +48,10 @@ def bollinger(close, period=20):
     lower = middle - (std * 2)
 
     return upper, middle, lower
+
+
+def adx(close, period=14):
+
+    change = close.diff().abs()
+
+    return change.rolling(period).mean()
