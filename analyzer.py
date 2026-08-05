@@ -1,7 +1,7 @@
 import pandas as pd
 
 from candle_service import get_candles
-from indicators import ema, rsi, macd, atr
+from indicators import ema, rsi, macd, atr, bollinger
 from strategy import score, signal
 
 
@@ -18,12 +18,16 @@ def analyze(symbol):
     macd_line, signal_line = macd(close)
     atr14 = atr(close)
 
+    upper_band, middle_band, lower_band = bollinger(close)
+
     score_value = score(
         ema20.iloc[-1],
         close.iloc[-1],
         rsi14.iloc[-1],
         macd_line.iloc[-1],
-        signal_line.iloc[-1]
+        signal_line.iloc[-1],
+        upper_band.iloc[-1],
+        lower_band.iloc[-1]
     )
 
     trade = signal(score_value)
