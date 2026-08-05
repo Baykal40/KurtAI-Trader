@@ -9,11 +9,11 @@ def rsi(close, period=14):
 
     delta = close.diff()
 
-    gain = delta.clip(lower=0)
-    loss = -delta.clip(upper=0)
+    gain = delta.where(delta > 0, 0)
+    loss = -delta.where(delta < 0, 0)
 
-    avg_gain = gain.rolling(period).mean()
-    avg_loss = loss.rolling(period).mean()
+    avg_gain = gain.ewm(alpha=1/period, adjust=False).mean()
+    avg_loss = loss.ewm(alpha=1/period, adjust=False).mean()
 
     rs = avg_gain / avg_loss
 
@@ -31,11 +31,24 @@ def macd(close):
     return macd_line, signal_line
 
 
-def atr(close, period=14):
+def atr(high, low, close, period=14):
 
-    tr = close.diff().abs()
+    high = pd.Series(high)
+    low = pd.Series(low)
+    close = pd.Series(close)
 
-    return tr.rolling(period).mean()
+    prev_close = close.shift(1)
+
+    tr = pd.concat(
+        [
+            high - low,
+            (high - prev_close).abs(),
+            (low - prev_close).abs()
+        ],
+        axis=1
+    ).max(axis=1)
+
+    return tr.ewm(alpha=1/period, adjust=False).mean()
 
 
 def bollinger(close, period=20):
@@ -48,10 +61,3 @@ def bollinger(close, period=20):
     lower = middle - (std * 2)
 
     return upper, middle, lower
-
-
-def adx(close, period=14):
-
-    change = close.diff().abs()
-
-    return change.rolling(period).mean()
