@@ -19,7 +19,9 @@ def analyze(symbol):
     score_value = score(
         ema20.iloc[-1],
         close.iloc[-1],
-        rsi14.iloc[-1]
+        rsi14.iloc[-1],
+        macd_line.iloc[-1],
+        signal_line.iloc[-1]
     )
 
     trade = signal(score_value)
