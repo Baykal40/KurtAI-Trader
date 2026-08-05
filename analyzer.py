@@ -7,9 +7,11 @@ from strategy import score, signal
 
 def analyze(symbol):
 
-    closes = get_candles(symbol)
+    candles = get_candles(symbol)
 
-    close = pd.Series(closes)
+    close = pd.Series(
+        [candle["close"] for candle in candles]
+    )
 
     ema20 = ema(close, 20)
     rsi14 = rsi(close)
@@ -30,5 +32,6 @@ def analyze(symbol):
         "symbol": symbol,
         "price": close.iloc[-1],
         "score": score_value,
-        "trade": trade
+        "trade": trade,
+        "candles": candles
     }

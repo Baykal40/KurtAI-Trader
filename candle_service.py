@@ -9,9 +9,17 @@ def get_candles(symbol, interval="1h", limit=200):
         limit=limit
     )
 
-    closes = []
+    candles = []
 
     for k in klines:
-        closes.append(float(k[4]))
 
-    return closes
+        candles.append({
+            "open": float(k[1]),
+            "high": float(k[2]),
+            "low": float(k[3]),
+            "close": float(k[4]),
+            "volume": float(k[5]),
+            "time": int(k[0])
+        })
+
+    return candles
