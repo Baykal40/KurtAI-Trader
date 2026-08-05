@@ -13,12 +13,17 @@ class PaperWallet:
 
         self.trade_history = []
 
+        self.total_profit = 0
+        self.total_loss = 0
+
     def show(self):
 
         print()
         print("Paper Wallet")
         print("Bakiye :", round(self.balance, 2), "USDT")
         print("Pozisyon Sayısı :", len(self.positions))
+        print("Toplam Kar :", round(self.total_profit, 2), "USDT")
+        print("Toplam Zarar :", round(self.total_loss, 2), "USDT")
 
         if self.positions:
 
@@ -31,11 +36,16 @@ class PaperWallet:
                     / position["buy_price"]
                 ) * 100
 
+                pnl_usdt = (
+                    position["amount"] * pnl_percent / 100
+                )
+
                 print(
                     f"{position['symbol']}"
                     f" | Alış: {position['buy_price']:.4f}"
                     f" | Güncel: {position['current_price']:.4f}"
                     f" | %{pnl_percent:.2f}"
+                    f" | {pnl_usdt:.2f} USDT"
                 )
 
     def has_position(self, symbol):
@@ -93,23 +103,36 @@ class PaperWallet:
                 / position["buy_price"]
             ) * 100
 
+            pnl_usdt = (
+                position["amount"] * pnl_percent / 100
+            )
+
             if (
                 pnl_percent <= self.stop_loss
                 or
                 pnl_percent >= self.take_profit
             ):
 
-                self.balance += position["amount"]
+                self.balance += (
+                    position["amount"] + pnl_usdt
+                )
+
+                if pnl_usdt >= 0:
+                    self.total_profit += pnl_usdt
+                else:
+                    self.total_loss += abs(pnl_usdt)
 
                 self.trade_history.append({
                     "symbol": position["symbol"],
-                    "pnl": round(pnl_percent, 2)
+                    "pnl_percent": round(pnl_percent, 2),
+                    "pnl_usdt": round(pnl_usdt, 2)
                 })
 
                 print()
                 print("🔴 POZİSYON KAPANDI")
                 print(position["symbol"])
                 print("PnL :", round(pnl_percent, 2), "%")
+                print("Kar/Zarar :", round(pnl_usdt, 2), "USDT")
 
                 closed.append(position)
 
