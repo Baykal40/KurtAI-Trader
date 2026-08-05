@@ -26,6 +26,7 @@ def analyze(symbol):
 
     return {
         "symbol": symbol,
+        "price": close.iloc[-1],
         "score": score_value,
         "trade": trade
     }

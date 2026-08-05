@@ -38,9 +38,17 @@ for coin in results[:10]:
 
 for coin in results:
 
+    wallet.update_price(
+        coin["symbol"],
+        coin["price"]
+    )
+
     if coin["trade"] == "🟢 AL":
 
-        wallet.buy(coin["symbol"])
+        wallet.buy(
+            coin["symbol"],
+            coin["price"]
+        )
 
 end = time.time()
 
