@@ -1,3 +1,5 @@
+from concurrent.futures import ThreadPoolExecutor
+
 from analyzer import analyze
 from paper_wallet import PaperWallet
 from backtest import Backtest
@@ -12,13 +14,13 @@ coins = get_usdt_coins(100)
 
 start = time.time()
 
-results = []
-
-for coin in coins:
-
-    result = analyze(coin["symbol"])
-
-    results.append(result)
+with ThreadPoolExecutor(max_workers=10) as executor:
+    results = list(
+        executor.map(
+            lambda coin: analyze(coin["symbol"]),
+            coins
+        )
+    )
 
 results.sort(
     key=lambda x: x["score"],
