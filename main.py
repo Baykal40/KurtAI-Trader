@@ -50,6 +50,8 @@ for coin in results:
             coin["price"]
         )
 
+wallet.check_positions()
+
 end = time.time()
 
 print()

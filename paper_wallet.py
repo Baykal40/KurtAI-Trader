@@ -8,6 +8,11 @@ class PaperWallet:
         self.max_positions = 10
         self.risk_percent = 10
 
+        self.stop_loss = -5
+        self.take_profit = 10
+
+        self.trade_history = []
+
     def show(self):
 
         print()
@@ -21,8 +26,10 @@ class PaperWallet:
 
             for position in self.positions:
 
-                pnl = position["current_price"] - position["buy_price"]
-                pnl_percent = (pnl / position["buy_price"]) * 100
+                pnl_percent = (
+                    (position["current_price"] - position["buy_price"])
+                    / position["buy_price"]
+                ) * 100
 
                 print(
                     f"{position['symbol']}"
@@ -74,21 +81,38 @@ class PaperWallet:
         print()
         print("🟢 SATIN ALINDI")
         print(symbol)
-        print("Alış Fiyatı :", buy_price)
-        print("Tutar :", round(amount, 2), "USDT")
 
-    def sell(self, symbol):
+    def check_positions(self):
+
+        closed = []
 
         for position in self.positions:
 
-            if position["symbol"] == symbol:
+            pnl_percent = (
+                (position["current_price"] - position["buy_price"])
+                / position["buy_price"]
+            ) * 100
+
+            if (
+                pnl_percent <= self.stop_loss
+                or
+                pnl_percent >= self.take_profit
+            ):
 
                 self.balance += position["amount"]
 
-                self.positions.remove(position)
+                self.trade_history.append({
+                    "symbol": position["symbol"],
+                    "pnl": round(pnl_percent, 2)
+                })
 
                 print()
-                print("🔴 SATILDI")
-                print(symbol)
+                print("🔴 POZİSYON KAPANDI")
+                print(position["symbol"])
+                print("PnL :", round(pnl_percent, 2), "%")
 
-                return
+                closed.append(position)
+
+        for position in closed:
+
+            self.positions.remove(position)
