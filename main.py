@@ -1,10 +1,12 @@
 from analyzer import analyze
 from paper_wallet import PaperWallet
+from backtest import Backtest
 from scanner import get_usdt_coins
 
 import time
 
 wallet = PaperWallet()
+backtest = Backtest()
 
 coins = get_usdt_coins(100)
 
@@ -52,9 +54,17 @@ for coin in results:
 
 wallet.check_positions()
 
+for trade in wallet.trade_history:
+
+    backtest.add_trade(
+        trade["pnl_usdt"]
+    )
+
 end = time.time()
 
 print()
 print("Analiz Süresi:", round(end - start, 2), "saniye")
 
 wallet.show()
+
+backtest.show()
